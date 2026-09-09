@@ -2,7 +2,8 @@
 
 2026「数字马力杯」浙江省大学生服务外包创新应用大赛 A21 赛题（恒生电子）参赛项目。
 
-当前进度：第九阶段「测试与验收」已完成——113 个单元测试全部通过，JaCoCo 行覆盖率 87.15%（门槛 80%）。
+当前进度：首页板块与企业知识库板块后端均已完成（前端界面按约定延后开发，接口已全部预留）——
+201 个单元测试全部通过，JaCoCo 行覆盖率 83.51%（门槛 80%）。
 
 ## 测试与覆盖率
 
@@ -33,7 +34,7 @@ npm run dev   # 开发地址 http://localhost:5173，接口已代理到 http://l
 
 ## 技术栈
 
-- 后端：JDK 17 LTS、Spring Boot 3.4.4、MyBatis-Plus 3.5.7、MySQL 8、Redis 7、RabbitMQ、Maven
+- 后端：JDK 17 LTS、Spring Boot 3.4.4、MyBatis-Plus 3.5.7、MySQL 8、Redis 7、RabbitMQ、Elasticsearch 8、MinIO、Maven
 - 前端：Vue 3、Vite、Element Plus、Pinia、Vue Router、Axios
 
 ## 目录说明
@@ -43,6 +44,18 @@ npm run dev   # 开发地址 http://localhost:5173，接口已代理到 http://l
 - `hs-office-server/`：后端 Spring Boot 工程
 - `hs-office-web/`：前端 Vue 3 工程
 - `docker/`：MySQL / Redis / RabbitMQ 本地环境编排（后续补充）
+
+## 企业知识库（后端）
+
+- 接口前缀 `/api/v1/knowledge`，覆盖：分类树、单/批量上传（PDF/DOC/DOCX/XLS/XLSX）、文档管理、
+  阅读/标记/批注、智能检索（全文 + 可选向量语义）、热门词/联想/相似推荐、数据看板、
+  每日披露文档抓取、今日金融新闻聚合、新闻一键转知识文档；完整清单见 `docs/后端-企业知识库/04-接口清单.md`；
+- 异步解析入库走 RabbitMQ，开关 `app.knowledge.async-enabled`；无 Broker 时同步执行；
+- 检索引擎开关 `app.knowledge.search.engine`：`elasticsearch`（验收/生产）或 `mysql`（ngram 全文降级）；
+  向量语义检索开关 `app.knowledge.search.embedding.enabled`，依赖 `app.llm` 配置；
+- 对象存储 `app.knowledge.storage.provider`：`minio`（Docker 部署）或 `local`（本地磁盘降级）；
+- 每日 0 点披露抓取 `app.knowledge.disclosure-crawl`（cron/开关），离线样例目录 `data/knowledge/disclosure/`；
+- 建表：`sql/03_knowledge_schema.sql`，分类初始化：`sql/04_knowledge_init_data.sql`（8 张表 + 17 个分类）。
 
 ## 演示账号
 
